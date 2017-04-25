@@ -40,7 +40,7 @@ static void run_program(void)
 static int merge_entry(int pos, const char *path)
 {
 	int found;
-	
+
 	if (pos >= active_nr)
 		die("git-merge-index: %s not in the cache", path);
 	arguments[0] = pgm;
@@ -84,6 +84,11 @@ static void merge_file(const char *path)
 		merge_entry(-pos-1, path);
 }
 
+/*
+ * >> wystan comments
+ * merge all staged entries(call the external merge-program to do one-file merge)
+ * stage == 0: means already be merged
+ */
 static void merge_all(void)
 {
 	int i;

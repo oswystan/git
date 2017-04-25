@@ -94,6 +94,11 @@ head_arg="$1"
 head=$(git-rev-parse --verify "$1"^0) || usage
 shift
 
+################################
+## >> wystan comments
+## get all remote heads sha1 into remoteheads
+##
+################################
 # All the rest are remote heads
 remoteheads=
 for remote
@@ -104,6 +109,10 @@ do
 done
 set x $remoteheads ; shift
 
+################################
+## >> wystan comments
+## get the common ancestors for the remote heads
+################################
 case "$#" in
 1)
 	common=$(git-merge-base --all $head "$@")
@@ -126,6 +135,11 @@ case "$#,$common,$no_commit" in
 	exit 0
 	;;
 1,"$head",*)
+    ################################
+    ## >> wystan comments
+    ## if the common ancestor is the current head, just do a fastward merge
+    ################################
+
 	# Again the most common case of merging one remote.
 	echo "Updating from $head to $1."
 	git-update-index --refresh 2>/dev/null
@@ -179,6 +193,13 @@ case "$#,$common,$no_commit" in
 	;;
 esac
 
+################################
+## >> wystan comments
+##
+## give the default strateties for different scenarios
+##     - recursive for 2 branches merge
+##     - octopus for 3 or more branches merge
+################################
 case "$use_strategies" in
 '')
 	case "$#" in
@@ -186,7 +207,7 @@ case "$use_strategies" in
 		use_strategies="$default_strategies" ;;
 	*)
 		use_strategies=octopus ;;
-	esac		
+	esac
 	;;
 esac
 
@@ -224,6 +245,10 @@ do
     # Remember which strategy left the state in the working tree
     wt_strategy=$strategy
 
+    ################################
+    ## >> wystan comments
+    ## do actually merging here
+    ################################
     git-merge-$strategy $common -- "$head_arg" "$@"
     exit=$?
     if test "$no_commit" = t && test "$exit" = 0
@@ -254,6 +279,15 @@ do
     # Automerge succeeded.
     result_tree=$(git-write-tree) && break
 done
+
+
+################################
+## >> wystan comments
+## merge succeeded, do some cleaning stuff
+##      - get all parents
+##      - write commit object
+##      - update the HEAD
+################################
 
 # If we have a resulting tree, that means the strategy module
 # auto resolved the merge cleanly.
