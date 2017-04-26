@@ -37,9 +37,19 @@ then
 	exit 2
 fi
 
+################################
+## >> wystan comments
+## 1. check whether already in merging state and update stat information in index file
+## 2. do simple merge by read-tree -m
+################################
 git-update-index --refresh 2>/dev/null
 git-read-tree -u -m $bases $head $remotes || exit 2
 echo "Trying simple merge."
+################################
+## >> wystan comments (shell skills)
+## if $(git-write-tree  2>/dev/null) executes success,
+## the if statement will get true else get false
+################################
 if result_tree=$(git-write-tree  2>/dev/null)
 then
 	exit 0

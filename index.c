@@ -6,6 +6,9 @@
 
 static struct cache_file *cache_file_list;
 
+/* >> wystan comments
+ * remove all file in cache_file_list
+ */
 static void remove_lock_file(void)
 {
 	while (cache_file_list) {
@@ -20,6 +23,13 @@ static void remove_lock_file_on_signal(int signo)
 	remove_lock_file();
 }
 
+/* >> wystan comments
+ *  create index.lock for index.
+ *  it is used for storing tmp information of index file.
+ *  tips:
+ *      - when SIGINT signaled, remove this the lock file
+ *      - when exit this program, remove this the lock file
+ */
 int hold_index_file_for_update(struct cache_file *cf, const char *path)
 {
 	int fd;

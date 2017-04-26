@@ -21,7 +21,7 @@ static int merge_size = 0;
 
 static struct object_list *trees = NULL;
 
-static struct cache_entry df_conflict_entry = { 
+static struct cache_entry df_conflict_entry = {
 };
 
 static struct tree_entry_list df_conflict_list = {
@@ -104,18 +104,11 @@ static int unpack_trees_rec(struct tree_entry_list **posns, int len,
 			}
 		}
 
-#if DBRT_DEBUG > 1
-		if (first)
-			printf("index %s\n", first);
-#endif
 		for (i = 0; i < len; i++) {
 			if (!posns[i] || posns[i] == &df_conflict_list)
 				continue;
-#if DBRT_DEBUG > 1
-			printf("%d %s\n", i + 1, posns[i]->name);
-#endif
 			if (!first || entcmp(first, firstdir,
-					     posns[i]->name, 
+					     posns[i]->name,
 					     posns[i]->directory) > 0) {
 				first = posns[i]->name;
 				firstdir = posns[i]->directory;
@@ -190,22 +183,8 @@ static int unpack_trees_rec(struct tree_entry_list **posns, int len,
 		if (any_files) {
 			if (merge) {
 				int ret;
-
-#if DBRT_DEBUG > 1
-				printf("%s:\n", first);
-				for (i = 0; i < src_size; i++) {
-					printf(" %d ", i);
-					if (src[i])
-						printf("%s\n", sha1_to_hex(src[i]->sha1));
-					else
-						printf("\n");
-				}
-#endif
 				ret = fn(src);
-				
-#if DBRT_DEBUG > 1
-				printf("Added %d entries\n", ret);
-#endif
+
 				*indpos += ret;
 			} else {
 				for (i = 0; i < src_size; i++) {
@@ -233,7 +212,7 @@ static int unpack_trees_rec(struct tree_entry_list **posns, int len,
 
 static void reject_merge(struct cache_entry *ce)
 {
-	die("Entry '%s' would be overwritten by merge. Cannot merge.", 
+	die("Entry '%s' would be overwritten by merge. Cannot merge.",
 	    ce->name);
 }
 
@@ -294,7 +273,7 @@ static int unpack_trees(merge_fn_t fn)
 {
 	int indpos = 0;
 	unsigned len = object_list_length(trees);
-	struct tree_entry_list **posns = 
+	struct tree_entry_list **posns =
 		xmalloc(len * sizeof(struct tree_entry_list *));
 	int i;
 	struct object_list *posn = trees;
@@ -328,7 +307,7 @@ static int same(struct cache_entry *a, struct cache_entry *b)
 		return 0;
 	if (!a && !b)
 		return 1;
-	return a->ce_mode == b->ce_mode && 
+	return a->ce_mode == b->ce_mode &&
 		!memcmp(a->sha1, b->sha1, 20);
 }
 
@@ -411,7 +390,7 @@ static void show_stage_entry(FILE *o,
 static int threeway_merge(struct cache_entry **stages)
 {
 	struct cache_entry *index;
-	struct cache_entry *head; 
+	struct cache_entry *head;
 	struct cache_entry *remote = stages[head_idx + 1];
 	int count;
 	int head_match = 0;
@@ -442,7 +421,7 @@ static int threeway_merge(struct cache_entry **stages)
 	}
 
 	/* First, if there's a #16 situation, note that to prevent #13
-	 * and #14. 
+	 * and #14.
 	 */
 	if (!same(remote, head)) {
 		for (i = 1; i < head_idx; i++) {
@@ -488,7 +467,7 @@ static int threeway_merge(struct cache_entry **stages)
 
 	/* Below are "no merge" cases, which require that the index be
 	 * up-to-date to avoid the files getting overwritten with
-	 * conflict resolution files. 
+	 * conflict resolution files.
 	 */
 	if (index) {
 		verify_uptodate(index);
@@ -689,6 +668,10 @@ int main(int argc, char **argv)
 		if (1 < index_only + update)
 			usage(read_tree_usage);
 
+        /* >> wystan comments
+         * get all sha1 object from parameters here
+         * and update the stage according to the amount of tree-ish
+         */
 		if (get_sha1(arg, sha1) < 0)
 			usage(read_tree_usage);
 		if (list_tree(sha1) < 0)
